@@ -159,14 +159,6 @@ CFDBOpen <- function(
 	require(DBI)
 	require(RPostgreSQL)
 
-	host <- "10.16.132.178"
-	host <- "173.251.12.186"
-	host <- "localhost"
-	port <- 5432
-	port <- 14434
-	password <- "startvm"
-	user <- "root"
-	
 	drv <- dbDriver("PostgreSQL")
 	
 	if ( !exists("dbname") ) { print("enter dbname (default: tempdb):"); dbname<-readLines(file("stdin"),1) }
