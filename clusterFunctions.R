@@ -104,7 +104,7 @@ plotClustersXcentered <- function(mydata, sortby="cpu", update=FALSE, factor = 1
 	mydata <- reorderClustersByCPU(mydata, sortby)
 	xmin <- floor(min(mydata$cpu, mydata$mem, mydata$net, mydata$disk))*factor
 	xeax <- ceiling(max(mydata$cpu, mydata$mem, mydata$net, mydata$disk))*factor
-	points(jitter(mydata$cluster+.5,factor=0.25)+0.225, mydata$cpu*factor, cex=0.001, col='blue', ylim=c(xmin,xmax), xlim=c(0,pam$nc+1), xlab="cluster", ylab="% utilization", ...)
+	plot(jitter(mydata$cluster+.5,factor=0.25)+0.225, mydata$cpu*factor, cex=0.001, col='blue', ylim=c(xmin,xmax), xlim=c(0,pam$nc+1), xlab="cluster", ylab="% utilization", ...)
 	points(jitter(mydata$cluster+.5,factor=0.25)+0.075, mydata$mem*factor, cex=0.001, col='red')
 	points(jitter(mydata$cluster+.5,factor=0.25)-0.075, mydata$net*factor, cex=0.001, col='gray')
 	points(jitter(mydata$cluster+0.5,factor=0.25)-0.225, mydata$disk*factor, cex=0.001, col='green')
@@ -133,14 +133,20 @@ plotClustersSpark <- function(mydata, sortby="cpu", update=FALSE) {
 	if ( update ) return(mydata)
 }
 
-plot4graph <- function(res) {
+plot4graph <- function(res, sortby="cpu") {
 	alldata <- data.frame(cpu=res$cpu_usage_rate_average, mem=res$mem_usage_absolute_average, net=res$net_usage_rate_average, disk=res$disk_usage_rate_average, resource=res$resource_name)
 	alldata <- na.omit(alldata)
+	
+	# changing to log(net,disk) per suggestion by Jeremy Eder
+	# adding 1 to each so we don't flake out on log(0) 
+	alldata$net <- log(alldata$net+1)
+	alldata$disk <- log(alldata$disk+1)
 	alldata$net <- alldata$net/max(alldata$net) * 100
 	alldata$disk <- alldata$disk/max(alldata$disk) * 100
+
 	#mydata <- scale(mydata)
 	mydata <- alldata[,1:4]
-	plotClusters(mydata, "mem")
+	plotClustersX(mydata, sortby=sortby)
 }
 
 transitions <- function(mydata) {
